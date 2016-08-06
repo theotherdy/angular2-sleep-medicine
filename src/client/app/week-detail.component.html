@@ -1,0 +1,97 @@
+<div class="row hidden-xs">
+    <div class="col-sm-12 text-center h4">
+        {{week.startDate | date:'d MMM'}} to {{week.endDate | date:'d MMM yy'}}
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4">
+        <div class="thumbnail">
+            <div class="image hidden-xs"><fa [name]="'film'" [size]=5></fa></div>
+            <div class="caption">
+                <div>
+                    <h3>LECTURE(S)</h3>
+                    <div class="list-group">
+                        <div *ngFor="let lecture of ((lecturesObservable | async)?.lectures | lectureType: 'main')" class="list-group-item">
+                            <!--a href="{{lecture.url}}" target="_blank" *ngFor="let lecture of ((lecturesObservable | async)?.lectures)" class="list-group-item"-->
+                            <a href="https://www.weblearn.ox.ac.uk{{lecture.url}}" target="_blank" >
+                            <!--a href="{{lecture.url}}" target="_blank" *ngFor="let lecture of (week.lectures)" class="list-group-item"-->
+                            <!--ref="{{lecture?.url}}" target="_blank" *ngFor="let lecture of (week?.lectures | lectureType: 'main')" class="list-group-item"-->
+                                <h4 class="list-group-item-heading"><fa [name]="'video-camera'"></fa> {{lecture.name}}</h4>
+                                <!--p class="list-group-item-text">{{lecture.description | descriptionFormatter}} <br/><strong>{{lecture.description | descriptionFormatter: 'lecturer'}}</strong></p-->
+                                <p class="list-group-item-text" [innerHTML]="lecture.description | descriptionFormatter"></p>
+                                <p class="list-group-item-text" [innerHTML]="lecture.description | descriptionFormatter: 'lecturer'"></p>
+
+                            </a>
+                            <!--div *ngIf="lecture.learningOutcomes"-->
+                                <button type="button" class="btn btn-primary" (click)="lecture.collapsed = !lecture.collapsed">Learning objectives</button>
+                                <div [collapse]="lecture.collapsed" class="card card-block card-header">
+                                    <div class="well well-lg" [innerHTML]="lecture.learningOutcomes"></div>
+                                </div>
+                            <!--/div-->
+                            <div *ngFor="let resource of (lecture.resources)" class="list-group-item">
+                                <a href="{{resource.url}}" target="_blank" >
+                                    <h4 class="list-group-item-heading"><fa [name]="'video-camera'"></fa> {{resource.name}}</h4>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="thumbnail">
+            <div class="image hidden-xs"><fa [name]="'users'" [size]=5></fa></div>
+            <div class="caption">
+                <div>
+                    <h3>SEMINAR</h3>
+                    <div class="list-group">
+                        <div *ngFor="let seminar of ((lecturesObservable | async)?.seminars)" class="list-group-item">
+                            <!--a href="{{lecture.url}}" target="_blank" *ngFor="let lecture of ((lecturesObservable | async)?.lectures)" class="list-group-item"-->
+                            <a href="https://www.weblearn.ox.ac.uk{{seminar.url}}" target="_blank" >
+                            <!--a href="{{lecture.url}}" target="_blank" *ngFor="let lecture of (week.lectures)" class="list-group-item"-->
+                            <!--ref="{{lecture?.url}}" target="_blank" *ngFor="let lecture of (week?.lectures | lectureType: 'main')" class="list-group-item"-->
+                                <h4 class="list-group-item-heading"><fa [name]="'sign-in'"></fa> Seminar</h4>
+                                <!--p class="list-group-item-text">{{lecture.description | descriptionFormatter}} <br/><strong>{{lecture.description | descriptionFormatter: 'lecturer'}}</strong></p-->
+                                <p class="list-group-item-text" [innerHTML]="seminar.description | descriptionFormatter"></p>
+                                <p class="list-group-item-text" [innerHTML]="seminar.description | descriptionFormatter: 'lecturer'"></p>
+
+                            </a>
+                            <button type="button" class="btn btn-primary" (click)="seminar.collapsed = !seminar.collapsed">Learning objectives</button>
+                            <div [collapse]="seminar.collapsed" class="card card-block card-header">
+                              <div class="well well-lg" [innerHTML]="seminar.learningOutcomes"></div>
+                            </div>
+                            <div *ngFor="let resource of (seminar.resources)" class="list-group-item">
+                                <a href="{{resource.url}}" target="_blank" >
+                                    <h4 class="list-group-item-heading"><fa [name]="'video-camera'"></fa> {{resource.name}}</h4>
+                                </a>
+                            </div>
+                        </div>
+                        <!--a href="{{seminar.url}}" target="_blank" *ngFor="let seminar of week.seminars" class="list-group-item">
+                            <h4 class="list-group-item-heading"><fa [name]="'sign-in'"></fa> {{seminar.title}}</h4>
+                            <p class="list-group-item-text">{{seminar.description | descriptionFormatter}} <br/><strong>{{seminar.description | descriptionFormatter: 'lecturer'}}</strong></p>
+                            <div class="list-group">
+                                <a href="{{assignment.url}}" target="_blank" *ngFor="let assignment of seminar.assignments" class="list-group-item">
+                                    <h4 class="list-group-item-heading"><fa [name]="'check'"></fa> {{assignment.title}}</h4>
+                                    <p class="list-group-item-text">{{assignment.description}}</p>
+                                </a>
+                            </div>
+                        </a-->
+                        <!-- Going to have to loop through items in resources treee here: reading lists, pdfs, links to activities -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="thumbnail">
+            <div class="image hidden-xs"><fa [name]="'book'" [size]=5></fa></div>
+            <div class="caption">
+                <div>
+                    <h3>RESOURCES</h3>
+                    <modyule-resource-component [modyule]="week.modyule"></modyule-resource-component>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
