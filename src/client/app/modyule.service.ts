@@ -24,6 +24,7 @@ export class ModyuleService {
         this.modyulesUrl = myGlobals.entityBrokerBaseUrl + myGlobals.urlToSpecifyPortal;
         this.modyulesUrl = this.modyulesUrl + myGlobals.baseSitePath + myGlobals.suffixForTestingOnly;
         return this.http.get(this.modyulesUrl)
+            .cache()
             .map(this.initialiseModyules)
             .catch(this.handleError);
     }
@@ -33,10 +34,10 @@ export class ModyuleService {
 
         for (let modyule of modyules){
             calls.push(
-                this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + modyule.siteId + '.json')//.cache()
+                this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + modyule.siteId + '.json').cache()
                 );
             calls.push(
-                this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.contentUrl + modyule.siteId + '.json')//.cache()
+                this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.contentUrl + modyule.siteId + '.json').cache()
                 );
         }
 

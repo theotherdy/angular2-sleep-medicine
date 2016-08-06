@@ -1,5 +1,7 @@
 import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChange} from '@angular/core';
 
+import { FaComponent } from 'angular2-fontawesome/components';
+
 import {CORE_DIRECTIVES} from '@angular/common';
 import { TAB_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 import { Observable }     from 'rxjs/Observable';
@@ -13,7 +15,7 @@ import { WeekDetailComponent } from './week-detail.component';
     moduleId: module.id,
     selector: 'weeks-component',
     templateUrl: 'week.component.html',
-    directives: [WeekDetailComponent,TAB_DIRECTIVES, CORE_DIRECTIVES],
+    directives: [WeekDetailComponent,TAB_DIRECTIVES, CORE_DIRECTIVES,FaComponent],
     changeDetection: ChangeDetectionStrategy.OnPush,
     styleUrls:  ['week.component.css'],
     providers: [WeekService]
@@ -64,6 +66,8 @@ export class WeekComponent implements OnChanges {
                     for(var week of this.modyule.weeks){
                         let startDateOfNextWeek: Date = new Date(startDateOfThisWeek.getTime());
                         startDateOfNextWeek.setDate(startDateOfNextWeek.getDate() + 7);
+                        week.startDate = new Date(startDateOfThisWeek.getTime());
+                        week.endDate = new Date(startDateOfNextWeek.getTime());
                         console.log(startDateOfThisWeek,startDateOfNextWeek);
                         let currentDate: Date = new Date();
                         if(currentDate >= startDateOfThisWeek && currentDate <= startDateOfNextWeek) {

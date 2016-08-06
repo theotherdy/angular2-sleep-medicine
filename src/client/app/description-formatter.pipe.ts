@@ -10,10 +10,12 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class DescriptionFormatterPipe implements PipeTransform {
     transform(descriptionText: string, getElement: string) {
         if(descriptionText!==null && descriptionText!==undefined) {
+            let posOfFirstBracket = descriptionText.lastIndexOf('[');
+            let posOfNextBracket = descriptionText.indexOf(']',posOfFirstBracket);  //ie after posOfFirstBracket
+            let contentsOfBrackets = descriptionText.slice(posOfFirstBracket+1,posOfNextBracket);
             if(getElement==='lecturer') {
-                let contentsOfBrackets = descriptionText.slice(descriptionText.lastIndexOf('[')+1,descriptionText.lastIndexOf(']')-1);
                 let lecturersToReturn = '';
-                if(contentsOfBrackets.indexOf('&') !== -1) {
+                if(contentsOfBrackets.indexOf('&amp;') !== -1) {
                     let lecturersList = contentsOfBrackets.split('&amp;');
                     let counter=1;
                     let noOfLecturers=lecturersList.length;
@@ -31,7 +33,7 @@ export class DescriptionFormatterPipe implements PipeTransform {
                 }
                 return lecturersToReturn; // descriptionText.slice(descriptionText.lastIndexOf('[')+1,descriptionText.length-1);
             } else {
-                return descriptionText.slice(0,descriptionText.lastIndexOf('['));
+                return descriptionText.replace('[' + contentsOfBrackets + ']','');
             }
         } else {
           return descriptionText;

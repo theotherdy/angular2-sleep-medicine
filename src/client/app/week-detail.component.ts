@@ -3,15 +3,14 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FaComponent } from 'angular2-fontawesome/components';
 
 import { CollapseDirective } from 'ng2-bootstrap/ng2-bootstrap';
+import { ACCORDION_DIRECTIVES } from 'ng2-bootstrap/ng2-bootstrap';
 
-//import {CORE_DIRECTIVES} from '@angular/common';
 import { Observable }     from 'rxjs/Observable';
 
 import { Week } from './week';
 import { LectureTypePipe } from './lecture-type.pipe';
 import { DescriptionFormatterPipe } from './description-formatter.pipe';
 import { WeekService } from './week.service';
-//import { Lecture } from './lecture';
 
 import { ModyuleResourceComponent } from './modyule-resource.component';
 
@@ -19,7 +18,7 @@ import { ModyuleResourceComponent } from './modyule-resource.component';
     moduleId: module.id,
     selector: 'week-detail-component',
     templateUrl: 'week-detail.component.html',
-    directives: [ModyuleResourceComponent,FaComponent,CollapseDirective],
+    directives: [ModyuleResourceComponent,FaComponent,ACCORDION_DIRECTIVES,CollapseDirective],
     styleUrls:  ['week-detail.component.css'],
     pipes: [LectureTypePipe, DescriptionFormatterPipe],
     providers: [WeekService]

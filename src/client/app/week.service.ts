@@ -22,7 +22,7 @@ export class WeekService {
     getWeeks (modyuleUrl: string): Observable<Week[]> {
         modyuleUrl = modyuleUrl.replace(myGlobals.unneededPartOfUrlForHierarchyCalls, '');
         return this.http.get(myGlobals.entityBrokerBaseUrl+myGlobals.urlToSpecifyPortal+modyuleUrl+myGlobals.suffixForTestingOnly)
-            //.cache()
+            .cache()
             .map(this.initialiseWeeks)
             .catch(this.handleError);
     }
@@ -32,7 +32,7 @@ export class WeekService {
 
         for (let week of weeks){
             calls.push(
-                this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + week.siteId + '.json')//.cache()
+                this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + week.siteId + '.json').cache()
                 );
         }
 
@@ -104,16 +104,25 @@ export class WeekService {
                         let cleanedResourcesUrl = lecture.resourcesUrl.replace('//','/');
                             return bodyAsJson.content_collection[0].resourceId.indexOf(cleanedResourcesUrl)!==-1;
                     });
-                    //if(foundLecture.resources===undefined){
-                        foundLecture.resources = new Array<Resource>();  //it won't have any yet
+                    foundLecture.resources = new Array<Resource>();  //it won't have any yet
 
-                        for(let resource of bodyAsJson.content_collection[0].resourceChildren){
-                            let tempResource: Resource = new Resource;
-                            tempResource.name = resource.name;
-                            tempResource.url = resource.url;
-                            foundLecture.resources.push(tempResource);
+                    for(let resource of bodyAsJson.content_collection[0].resourceChildren){
+                        let tempResource: Resource = new Resource;
+                        tempResource.name = resource.name;
+                        tempResource.url = resource.url;
+                        if(resource.fileType === "org.sakaiproject.citation.impl.CitationList") { //it's a reading list
+                            tempResource.fileType = "reading";
+                        } else if (resource.url.indexOf('pdf')!==-1) {
+                            tempResource.fileType = "pdf";
+                        } else if (resource.url.indexOf('xls')!==-1) {
+                            tempResource.fileType = "xls";
+                        } else if (resource.url.indexOf('doc')!==-1) {
+                            tempResource.fileType = "doc";
+                        } else {
+                            tempResource.fileType = "file";
                         }
-                    //}
+                        foundLecture.resources.push(tempResource);
+                    }
                 }
             }
             subject.next(week);
@@ -157,16 +166,25 @@ export class WeekService {
                         let cleanedResourcesUrl = seminar.resourcesUrl.replace('//','/');
                             return bodyAsJson.content_collection[0].resourceId.indexOf(cleanedResourcesUrl)!==-1;
                     });
-                    //if(foundLecture.resources===undefined){
-                        foundSeminar.resources = new Array<Resource>();  //it won't have any yet
+                    foundSeminar.resources = new Array<Resource>();  //it won't have any yet
 
-                        for(let resource of bodyAsJson.content_collection[0].resourceChildren){
-                            let tempResource: Resource = new Resource;
-                            tempResource.name = resource.name;
-                            tempResource.url = resource.url;
-                            foundSeminar.resources.push(tempResource);
+                    for(let resource of bodyAsJson.content_collection[0].resourceChildren){
+                        let tempResource: Resource = new Resource;
+                        tempResource.name = resource.name;
+                        tempResource.url = resource.url;
+                        if(resource.fileType === "org.sakaiproject.citation.impl.CitationList") { //it's a reading list
+                            tempResource.fileType = "reading";
+                        } else if (resource.url.indexOf('pdf')!==-1) {
+                            tempResource.fileType = "pdf";
+                        } else if (resource.url.indexOf('xls')!==-1) {
+                            tempResource.fileType = "xls";
+                        } else if (resource.url.indexOf('doc')!==-1) {
+                            tempResource.fileType = "doc";
+                        } else {
+                            tempResource.fileType = "file";
                         }
-                    //}
+                        foundSeminar.resources.push(tempResource);
+                    }
                 }
             }
             subject.next(week);
