@@ -20,8 +20,16 @@ export class WeekService {
     constructor (private http: Http) {}
 
     getWeeks (modyuleUrl: string): Observable<Week[]> {
-        modyuleUrl = modyuleUrl.replace(myGlobals.unneededPartOfUrlForHierarchyCalls, '');
-        return this.http.get(myGlobals.entityBrokerBaseUrl+myGlobals.urlToSpecifyPortal+modyuleUrl+myGlobals.suffixForTestingOnly)
+        modyuleUrl = modyuleUrl.replace(myGlobals.unneededPartOfUrlForHierarchyCalls[myGlobals.runtimeEnvironment], '');
+        if (myGlobals.runtimeEnvironment === 1) {//we're live in WL
+            //fudge to change parameters returned by EB portal-hieracrchy so they can be used as portalpath query string
+            modyuleUrl = modyuleUrl.substring(1); //removes first colon
+            modyuleUrl = modyuleUrl.replace(/:/g,'/'); //converts colons globally to '/'
+        }
+        let urlToGet: string = myGlobals.entityBrokerBaseUrl[myGlobals.runtimeEnvironment];
+        urlToGet = urlToGet + myGlobals.urlToSpecifyPortal[myGlobals.runtimeEnvironment];
+        urlToGet = urlToGet + modyuleUrl+myGlobals.suffixForTestingOnly[myGlobals.runtimeEnvironment];
+        return this.http.get(urlToGet)
             .cache()
             .map(this.initialiseWeeks)
             .catch(this.handleError);
@@ -31,8 +39,10 @@ export class WeekService {
         let calls: any[]  = [];
 
         for (let week of weeks){
+            let urlToGet: string = myGlobals.entityBrokerBaseUrl[myGlobals.runtimeEnvironment];
+            urlToGet = urlToGet + myGlobals.lessonsUrl + week.siteId + '.json';
             calls.push(
-                this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + week.siteId + '.json').cache()
+                this.http.get(urlToGet).cache()
                 );
         }
 
@@ -63,7 +73,7 @@ export class WeekService {
 
     getWeekLesson(week: Week): Observable<Week> {
         let lessonUrl = week.lessonUrl.replace(myGlobals.unneededPartOfUrlForLessonCalls, '');
-        return this.http.get(myGlobals.entityBrokerBaseUrl+lessonUrl + '.json')
+        return this.http.get(myGlobals.entityBrokerBaseUrl[myGlobals.runtimeEnvironment]+lessonUrl + '.json')
             //.cache()
             .map(this.processLessons)
             .catch(this.handleError);
@@ -76,13 +86,15 @@ export class WeekService {
             if(lecture.learningOutcomesUrl !== undefined && lecture.learningOutcomes===undefined) {
                 let lessonUrl = lecture.learningOutcomesUrl.replace(myGlobals.unneededPartOfUrlForLessonCalls, '');
                 calls.push(  //learning outcomes
-                    this.http.get(myGlobals.entityBrokerBaseUrl+lessonUrl + '.json')//.cache()
+                    this.http.get(myGlobals.entityBrokerBaseUrl[myGlobals.runtimeEnvironment] + lessonUrl + '.json')//.cache()
                     );
             }
             if(lecture.resourcesUrl !== undefined && lecture.resources===undefined) {
                 let resourcesUrl = lecture.resourcesUrl.replace('/group/', '');
+                let urlToGet: string = myGlobals.entityBrokerBaseUrl[myGlobals.runtimeEnvironment];
+                urlToGet = urlToGet + myGlobals.contentUrl + resourcesUrl + '.json';
                 calls.push(  //reading list, other resources
-                    this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.contentUrl + resourcesUrl + '.json')//.cache()
+                    this.http.get(urlToGet)//.cache()
                     );
             }
         }
@@ -110,16 +122,19 @@ export class WeekService {
                         let tempResource: Resource = new Resource;
                         tempResource.name = resource.name;
                         tempResource.url = resource.url;
-                        if(resource.fileType === "org.sakaiproject.citation.impl.CitationList") { //it's a reading list
-                            tempResource.fileType = "reading";
+                        if(resource.description !== '') {
+                            tempResource.description = resource.description;
+                        }
+                        if(resource.type === 'org.sakaiproject.citation.impl.CitationList') { //it's a reading list
+                            tempResource.fileType = 'reading';
                         } else if (resource.url.indexOf('pdf')!==-1) {
-                            tempResource.fileType = "pdf";
+                            tempResource.fileType = 'pdf';
                         } else if (resource.url.indexOf('xls')!==-1) {
-                            tempResource.fileType = "xls";
+                            tempResource.fileType = 'xls';
                         } else if (resource.url.indexOf('doc')!==-1) {
-                            tempResource.fileType = "doc";
+                            tempResource.fileType = 'doc';
                         } else {
-                            tempResource.fileType = "file";
+                            tempResource.fileType = 'file';
                         }
                         foundLecture.resources.push(tempResource);
                     }
@@ -138,13 +153,15 @@ export class WeekService {
             if(seminar.learningOutcomesUrl !== undefined && seminar.learningOutcomes===undefined) {
                 let lessonUrl = seminar.learningOutcomesUrl.replace(myGlobals.unneededPartOfUrlForLessonCalls, '');
                 calls.push(  //learning outcomes
-                    this.http.get(myGlobals.entityBrokerBaseUrl+lessonUrl + '.json')//.cache()
+                    this.http.get(myGlobals.entityBrokerBaseUrl[myGlobals.runtimeEnvironment] + lessonUrl + '.json')//.cache()
                     );
             }
             if(seminar.resourcesUrl !== undefined && seminar.resources===undefined) {
                 let resourcesUrl = seminar.resourcesUrl.replace('/group/', '');
+                let urlToGet: string = myGlobals.entityBrokerBaseUrl[myGlobals.runtimeEnvironment];
+                urlToGet = urlToGet + myGlobals.contentUrl + resourcesUrl + '.json';
                 calls.push(  //reading list, other resources
-                    this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.contentUrl + resourcesUrl + '.json')//.cache()
+                    this.http.get(urlToGet)//.cache()
                     );
             }
         }
@@ -172,16 +189,19 @@ export class WeekService {
                         let tempResource: Resource = new Resource;
                         tempResource.name = resource.name;
                         tempResource.url = resource.url;
-                        if(resource.fileType === "org.sakaiproject.citation.impl.CitationList") { //it's a reading list
-                            tempResource.fileType = "reading";
+                        if(resource.description !== '') {
+                            tempResource.description = resource.description;
+                        }
+                        if(resource.type === 'org.sakaiproject.citation.impl.CitationList') { //it's a reading list
+                            tempResource.fileType = 'reading';
                         } else if (resource.url.indexOf('pdf')!==-1) {
-                            tempResource.fileType = "pdf";
+                            tempResource.fileType = 'pdf';
                         } else if (resource.url.indexOf('xls')!==-1) {
-                            tempResource.fileType = "xls";
+                            tempResource.fileType = 'xls';
                         } else if (resource.url.indexOf('doc')!==-1) {
-                            tempResource.fileType = "doc";
+                            tempResource.fileType = 'doc';
                         } else {
-                            tempResource.fileType = "file";
+                            tempResource.fileType = 'file';
                         }
                         foundSeminar.resources.push(tempResource);
                     }

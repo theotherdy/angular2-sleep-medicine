@@ -21,8 +21,9 @@ export class ModyuleService {
     constructor (private http: Http) {}
 
     getModyules (): Observable<Modyule[]> {
-        this.modyulesUrl = myGlobals.entityBrokerBaseUrl + myGlobals.urlToSpecifyPortal;
-        this.modyulesUrl = this.modyulesUrl + myGlobals.baseSitePath + myGlobals.suffixForTestingOnly;
+        this.modyulesUrl = myGlobals.entityBrokerBaseUrl[myGlobals.runtimeEnvironment];
+        this.modyulesUrl = this.modyulesUrl + myGlobals.urlToSpecifyPortal[myGlobals.runtimeEnvironment];
+        this.modyulesUrl = this.modyulesUrl + myGlobals.baseSitePath + myGlobals.suffixForTestingOnly[myGlobals.runtimeEnvironment];
         return this.http.get(this.modyulesUrl)
             .cache()
             .map(this.initialiseModyules)
@@ -33,11 +34,15 @@ export class ModyuleService {
         let calls: any[]  = [];
 
         for (let modyule of modyules){
+            let urlToGet: string = myGlobals.entityBrokerBaseUrl[myGlobals.runtimeEnvironment];
+            urlToGet = urlToGet + myGlobals.lessonsUrl + modyule.siteId + '.json';
             calls.push(
-                this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.lessonsUrl + modyule.siteId + '.json').cache()
+                this.http.get(urlToGet).cache()
                 );
+            urlToGet = myGlobals.entityBrokerBaseUrl[myGlobals.runtimeEnvironment];
+            urlToGet = urlToGet + myGlobals.contentUrl + modyule.siteId + '.json';
             calls.push(
-                this.http.get(myGlobals.entityBrokerBaseUrl + myGlobals.contentUrl + modyule.siteId + '.json').cache()
+                this.http.get(urlToGet).cache()
                 );
         }
 
@@ -77,7 +82,7 @@ export class ModyuleService {
 
     getModyuleLesson(modyule: Modyule): Observable<Modyule> {
         let lessonUrl = modyule.lessonUrl.replace(myGlobals.unneededPartOfUrlForLessonCalls, '');
-        return this.http.get(myGlobals.entityBrokerBaseUrl+lessonUrl + '.json')
+        return this.http.get(myGlobals.entityBrokerBaseUrl[myGlobals.runtimeEnvironment] + lessonUrl + '.json')
             //.cache()
             .map(this.processLessons)
             .catch(this.handleError);

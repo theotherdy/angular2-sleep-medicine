@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 //import { Router } from '@angular/router-deprecated';
 //import { RouteParams } from '@angular/router-deprecated';
 
-import { DROPDOWN_DIRECTIVES, CollapseDirective } from 'ng2-bootstrap/ng2-bootstrap';
+import { DROPDOWN_DIRECTIVES, CollapseDirective, AlertComponent } from 'ng2-bootstrap/ng2-bootstrap';
 
 import { Modyule } from './modyule';
 import { ModyuleService } from './modyule.service';
@@ -14,7 +14,7 @@ import myGlobals = require('./globals');
     moduleId: module.id,
     selector: 'modyules-component',
     templateUrl: 'modyule.component.html',
-    directives: [WeekComponent,DROPDOWN_DIRECTIVES,CollapseDirective],
+    directives: [WeekComponent,DROPDOWN_DIRECTIVES,CollapseDirective,AlertComponent],
     providers: [ModyuleService]
 })
 
@@ -23,6 +23,7 @@ export class ModyuleComponent implements OnInit {
     selectedModyule: Modyule;
     error: any;
     modyule: Modyule;
+    noModyulesFound: boolean = true;
 
     errorMessage: string;
     mode = 'Observable';
@@ -56,6 +57,10 @@ export class ModyuleComponent implements OnInit {
                 modyules => {
                     //@todo - deal with research modyules seaparately otherwise if two are concurrent, not sure which one will be returned
                     //first sort returned modyules into name order
+                    if (modyules.length > 0) {
+                        this.noModyulesFound = false;
+                    }
+
                     modyules.sort(this.compareByModyuleDate);
 
                     this.modyules = modyules;
